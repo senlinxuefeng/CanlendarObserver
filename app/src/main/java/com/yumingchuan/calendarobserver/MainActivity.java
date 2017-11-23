@@ -1,21 +1,18 @@
 package com.yumingchuan.calendarobserver;
 
-import android.content.ContentUris;
-import android.content.Context;
-import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
-import android.provider.CalendarContract;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
-import android.widget.Toast;
+import android.view.ViewGroup;
 
 import java.util.Calendar;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+    private BaseRecyclerViewAdapter baseRecyclerViewAdapter;
 
 
 //    String[] projection = new String[] { CalendarContract.Events._ID , CalendarContract.Events.CALENDAR_ID, CalendarContract.Events.TITLE, CalendarContract.Events.DESCRIPTION, CalendarContract.Events.DTSTART, CalendarContract.Events.DTEND, CalendarContract.Events.ALL_DAY, CalendarContract.Events.EVENT_LOCATION , CalendarContract.Events.RRULE ,CalendarContract.Events.DURATION };
@@ -29,93 +26,75 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Button btnSchedule = findViewById(R.id.btnSchedule);
-        Button printSchedule = findViewById(R.id.printSchedule);
-        Button openLocalCalendarScheduleDetail = findViewById(R.id.openLocalCalendarScheduleDetail);
 
-        btnSchedule.setOnClickListener(new View.OnClickListener() {
+
+        addListener();
+
+        initAdapter();
+    }
+
+    private void initAdapter() {
+        RecyclerView recyclerView = findViewById(R.id.recyclerView);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        baseRecyclerViewAdapter = new BaseRecyclerViewAdapter<ScheduleToDo>() {
+
             @Override
-            public void onClick(View view) {
+            public void onBindViewHolder(BaseViewHolder holder, int position) {
+                super.onBindViewHolder(holder, position);
+            }
+
+            @Override
+            public View onCreateView(ViewGroup parent, int viewType) {
+                return null;
+            }
+
+            @Override
+            public void bindViewData(View itemView, ScheduleToDo scheduleToDo, int position) {
+
+            }
+
+//            @Override
+//            public View onCreateView(ViewGroup parent, int viewType) {
+//                return LayoutInflater.from(getBaseContext()).inflate(R.layout.item_schedule, parent);
+//            }
+//
+//            @Override
+//            public void bindViewData(View itemView, ScheduleToDo scheduleToDo, int position) {
+//                TextView title = itemView.findViewById(R.id.title);
+//                TextView content = itemView.findViewById(R.id.content);
+//                title.setText(scheduleToDo.getpTitle());
+//                content.setText(scheduleToDo.getpNote() != null ? scheduleToDo.getpNote() : "");
+//            }
+        };
+        recyclerView.setAdapter(baseRecyclerViewAdapter);
+    }
+
+    private void addListener() {
+        findViewById(R.id.btnSchedule).setOnClickListener(this);
+        findViewById(R.id.printSchedule).setOnClickListener(this);
+        findViewById(R.id.openLocalCalendarScheduleDetail).setOnClickListener(this);
+    }
+
+
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.btnSchedule:
                 LocalCalendar.addCalendarEvent(getApplicationContext(), "添加一天日程数据到日历", "日程内容", Calendar.getInstance().getTime().getTime());
-            }
-        });
+                break;
+            case R.id.printSchedule:
+//                printSchedule();
+                baseRecyclerViewAdapter.reloadData(LocalCalendar.getAllCalendarEvent(getApplicationContext()));
+                break;
+            case R.id.openLocalCalendarScheduleDetail:
+                LocalCalendar.openCalendarEventDetail(getApplicationContext());
+                break;
 
+            default:
 
-        printSchedule.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                printSchedule();
-            }
-        });
-
-
-        openLocalCalendarScheduleDetail.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-//                Calendar beginTime = Calendar.getInstance();
-//                beginTime.set(2017, 0, 13, 7, 30);
-//                Calendar endTime = Calendar.getInstance();
-//                endTime.set(20127, 0, 13, 8, 30);
-////                Intent intent = new Intent(Intent.ACTION_GET_CONTENT)
-//                Intent intent = new Intent(CalendarContract.Events.CONTENT_URI)
-//                        .setData(CalendarContract.Events.CONTENT_URI)
-//                        .putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, beginTime.getTimeInMillis())
-//                        .putExtra(CalendarContract.EXTRA_EVENT_END_TIME, endTime.getTimeInMillis())
-//                        .putExtra(CalendarContract.Events.TITLE, "Yoga")
-//                        .putExtra(CalendarContract.Events.DESCRIPTION, "Group class")
-//                        .putExtra(CalendarContract.Events.EVENT_LOCATION, "The gym")
-//                        .putExtra(CalendarContract.Events.AVAILABILITY, CalendarContract.Events.AVAILABILITY_BUSY)
-//                        .putExtra(Intent.EXTRA_EMAIL, "rowan@example.com,trevor@example.com");
-//                startActivity(intent);
-
-                gotoCalendarApp(getApplicationContext());
-            }
-        });
-
-
-    }
-
-
-    /**
-     * 打开日历日程数据的详情
-     */
-    public void openCalendarEventDetail(Context cnt) {
-
-        //具体的一条日历数据
-//        id=2   pTitle=1   pNote=null   startDate=1511488800000   endDate=1511492400000
-
-        try {
-            Intent t_intent = new Intent(Intent.ACTION_VIEW);
-            t_intent.addCategory(Intent.CATEGORY_DEFAULT);
-            t_intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK
-                    | Intent.FLAG_ACTIVITY_TASK_ON_HOME);
-            Uri uri = ContentUris.withAppendedId(CalendarContract.Events.CONTENT_URI, 2);
-            t_intent.setData(uri);
-            cnt.startActivity(t_intent);
-        } catch (Exception e) {
-            e.printStackTrace();
-            Toast.makeText(cnt, "打开日历失败", Toast.LENGTH_SHORT).show();
+                break;
         }
     }
-
-
-    /**
-     * 打开日历应用
-     */
-    public void gotoCalendarApp(Context cnt) {
-        try {
-            Intent t_intent = new Intent(Intent.ACTION_VIEW);
-            t_intent.addCategory(Intent.CATEGORY_DEFAULT);
-            t_intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK
-                    | Intent.FLAG_ACTIVITY_TASK_ON_HOME);
-            t_intent.setDataAndType(Uri.parse("content://com.android.calendar/"), "time/epoch");
-            cnt.startActivity(t_intent);
-        } catch (Exception e) {
-            e.printStackTrace();
-            Toast.makeText(cnt, "打开日历失败", Toast.LENGTH_SHORT).show();
-        }
-    }
-
 
     private void printSchedule() {
         List<ScheduleToDo> temp = LocalCalendar.getAllCalendarEvent(getApplicationContext());
@@ -123,6 +102,7 @@ public class MainActivity extends AppCompatActivity {
             Log.i("temptemp", temp.get(i).toString());
         }
     }
+
 
 
 }

@@ -3,12 +3,14 @@ package com.yumingchuan.calendarobserver;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.net.Uri;
 import android.provider.CalendarContract;
 import android.text.TextUtils;
 import android.util.Log;
+import android.widget.Toast;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -221,6 +223,47 @@ public class LocalCalendar {
         }
 
         return calendarEvents;
+    }
+
+
+    /**
+     * 打开日历日程数据的详情
+     */
+    public static void openCalendarEventDetail(Context cnt) {
+
+        //具体的一条日历数据
+//        id=2   pTitle=1   pNote=null   startDate=1511488800000   endDate=1511492400000
+
+        try {
+            Intent t_intent = new Intent(Intent.ACTION_VIEW);
+            t_intent.addCategory(Intent.CATEGORY_DEFAULT);
+            t_intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK
+                    | Intent.FLAG_ACTIVITY_TASK_ON_HOME);
+            Uri uri = ContentUris.withAppendedId(CalendarContract.Events.CONTENT_URI, 2);
+            t_intent.setData(uri);
+            cnt.startActivity(t_intent);
+        } catch (Exception e) {
+            e.printStackTrace();
+            Toast.makeText(cnt, "打开日历失败", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+
+    /**
+     * 打开日历应用
+     */
+    public static void gotoCalendarApp(Context cnt) {
+        try {
+            Intent t_intent = new Intent(Intent.ACTION_VIEW);
+            t_intent.addCategory(Intent.CATEGORY_DEFAULT);
+            t_intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK
+                    | Intent.FLAG_ACTIVITY_TASK_ON_HOME);
+            t_intent.setDataAndType(Uri.parse("content://com.android.calendar/"), "time/epoch");
+            cnt.startActivity(t_intent);
+        } catch (Exception e) {
+            e.printStackTrace();
+            Toast.makeText(cnt, "打开日历失败", Toast.LENGTH_SHORT).show();
+        }
     }
 
 }
