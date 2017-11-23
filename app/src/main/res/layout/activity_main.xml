@@ -11,19 +11,19 @@
         android:id="@+id/btnSchedule"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="添加日程" />
+        android:text="添加日程数据到本地日历" />
 
     <Button
         android:id="@+id/printSchedule"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="打印日程" />
+        android:text="显示添加的日程数据" />
 
-    <Button
-        android:id="@+id/openLocalCalendarScheduleDetail"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="打印本地日历日程的详情" />
+    <!--<Button-->
+        <!--android:id="@+id/openLocalCalendarScheduleDetail"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:text="打印本地日历日程的详情" />-->
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recyclerView"

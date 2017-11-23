@@ -13,9 +13,11 @@ import android.util.Log;
 import android.widget.Toast;
 
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
 
@@ -143,7 +145,7 @@ public class LocalCalendar {
         }
     }
 
-    private static DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+    private static DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd 00:00:00");
 
 
     public static void deleteCalendarEvent(Context context, String title) {
@@ -176,50 +178,50 @@ public class LocalCalendar {
 
     public static List<ScheduleToDo> getAllCalendarEvent(Context context) {
 
-
-        Calendar calendar = Calendar.getInstance();
-        dateFormat.format(calendar.getTime());
-
-        long startTime = calendar.getTime().getTime();
-        long endTime = calendar.getTime().getTime() + 1000 * 60 * 60 * 24;
-
-        // String[] selectionArgs = {android.provider.CalendarContract.Events.DTSTART + ">" + 1, android.provider.CalendarContract.Events.DTEND + "<" + 1};
-//        String selection = android.provider.CalendarContract.Events.DTSTART + "<" + 11119910011111L;
-        String selection = android.provider.CalendarContract.Events.DTSTART + ">" + startTime + " and "
-                + android.provider.CalendarContract.Events.DTEND + "<" + endTime;
-
-        Log.i("temptemp", startTime + "    " + endTime);
-
-
-        String testSelection = CalendarContract.Events.TITLE + "='1'";
-
-
         List<ScheduleToDo> calendarEvents = new ArrayList<>();
 
-        Cursor eventCursor = context.getContentResolver().query(Uri.parse(CALANDER_EVENT_URL), null, selection, null, null);
         try {
-            if (eventCursor == null)//查询返回空值
-                return calendarEvents;
-            if (eventCursor.getCount() > 0) {
-                //遍历所有事件，找到title跟需要查询的title一样的项
-                for (eventCursor.moveToFirst(); !eventCursor.isAfterLast(); eventCursor.moveToNext()) {
+            long startTime = dateFormat.parse(new SimpleDateFormat("yyyy-MM-dd").format(new Date()) + " 00:00:00").getTime();
+            long endTime = startTime + 1000 * 60 * 60 * 24;
 
-                    ScheduleToDo scheduleToDo = new ScheduleToDo();
+            // String[] selectionArgs = {android.provider.CalendarContract.Events.DTSTART + ">" + 1, android.provider.CalendarContract.Events.DTEND + "<" + 1};
+//        String selection = android.provider.CalendarContract.Events.DTSTART + "<" + 11119910011111L;
+            String selection = android.provider.CalendarContract.Events.DTSTART + ">" + startTime + " and "
+                    + android.provider.CalendarContract.Events.DTEND + "<" + endTime;
 
-                    scheduleToDo.setId(eventCursor.getInt(eventCursor.getColumnIndex(CalendarContract.Calendars._ID)) + "");
-                    scheduleToDo.setpTitle(eventCursor.getString(eventCursor.getColumnIndex(CalendarContract.Events.TITLE)));
-                    scheduleToDo.setpNote(eventCursor.getString(eventCursor.getColumnIndex(CalendarContract.Events.DESCRIPTION)));
-                    scheduleToDo.setStartDate(eventCursor.getLong(eventCursor.getColumnIndex(CalendarContract.Events.DTSTART)) + "");
-                    scheduleToDo.setEndDate(eventCursor.getLong(eventCursor.getColumnIndex(CalendarContract.Events.DTEND)) + "");
+            Log.i("temptemp", startTime + "    " + endTime);
+
+
+            String testSelection = CalendarContract.Events.TITLE + "='1'";
+
+
+            Cursor eventCursor = context.getContentResolver().query(Uri.parse(CALANDER_EVENT_URL), null, selection, null, null);
+            try {
+                if (eventCursor == null)//查询返回空值
+                    return calendarEvents;
+                if (eventCursor.getCount() > 0) {
+                    //遍历所有事件，找到title跟需要查询的title一样的项
+                    for (eventCursor.moveToFirst(); !eventCursor.isAfterLast(); eventCursor.moveToNext()) {
+
+                        ScheduleToDo scheduleToDo = new ScheduleToDo();
+
+                        scheduleToDo.setId(eventCursor.getInt(eventCursor.getColumnIndex(CalendarContract.Calendars._ID)) + "");
+                        scheduleToDo.setpTitle(eventCursor.getString(eventCursor.getColumnIndex(CalendarContract.Events.TITLE)));
+                        scheduleToDo.setpNote(eventCursor.getString(eventCursor.getColumnIndex(CalendarContract.Events.DESCRIPTION)));
+                        scheduleToDo.setStartDate(eventCursor.getLong(eventCursor.getColumnIndex(CalendarContract.Events.DTSTART)) + "");
+                        scheduleToDo.setEndDate(eventCursor.getLong(eventCursor.getColumnIndex(CalendarContract.Events.DTEND)) + "");
 //                    scheduleToDo.setEvent(eventCursor.getString(eventCursor.getColumnIndex(CalendarContract.Events.SYNC_EVENTS)));
 
-                    calendarEvents.add(scheduleToDo);
+                        calendarEvents.add(scheduleToDo);
+                    }
+                }
+            } finally {
+                if (eventCursor != null) {
+                    eventCursor.close();
                 }
             }
-        } finally {
-            if (eventCursor != null) {
-                eventCursor.close();
-            }
+        } catch (ParseException e) {
+            e.printStackTrace();
         }
 
         return calendarEvents;

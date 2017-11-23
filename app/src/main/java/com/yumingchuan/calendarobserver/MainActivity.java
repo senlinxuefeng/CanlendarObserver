@@ -5,8 +5,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import java.util.Calendar;
 import java.util.List;
@@ -37,34 +39,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         RecyclerView recyclerView = findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         baseRecyclerViewAdapter = new BaseRecyclerViewAdapter<ScheduleToDo>() {
-
-            @Override
-            public void onBindViewHolder(BaseViewHolder holder, int position) {
-                super.onBindViewHolder(holder, position);
-            }
-
             @Override
             public View onCreateView(ViewGroup parent, int viewType) {
-                return null;
+                return LayoutInflater.from(getBaseContext()).inflate(R.layout.item_schedule, null);
             }
 
             @Override
             public void bindViewData(View itemView, ScheduleToDo scheduleToDo, int position) {
-
+                TextView title = itemView.findViewById(R.id.title);
+                TextView content = itemView.findViewById(R.id.content);
+                title.setText(scheduleToDo.getpTitle());
+                content.setText(scheduleToDo.getpNote() != null ? scheduleToDo.getpNote() : "");
             }
-
-//            @Override
-//            public View onCreateView(ViewGroup parent, int viewType) {
-//                return LayoutInflater.from(getBaseContext()).inflate(R.layout.item_schedule, parent);
-//            }
-//
-//            @Override
-//            public void bindViewData(View itemView, ScheduleToDo scheduleToDo, int position) {
-//                TextView title = itemView.findViewById(R.id.title);
-//                TextView content = itemView.findViewById(R.id.content);
-//                title.setText(scheduleToDo.getpTitle());
-//                content.setText(scheduleToDo.getpNote() != null ? scheduleToDo.getpNote() : "");
-//            }
         };
         recyclerView.setAdapter(baseRecyclerViewAdapter);
     }
@@ -80,10 +66,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btnSchedule:
-                LocalCalendar.addCalendarEvent(getApplicationContext(), "添加一天日程数据到日历", "日程内容", Calendar.getInstance().getTime().getTime());
+                LocalCalendar.addCalendarEvent(getApplicationContext(), "添加第" + baseRecyclerViewAdapter.getItemCount() + "条日程数据到日历", "日程内容", Calendar.getInstance().getTime().getTime());
                 break;
             case R.id.printSchedule:
-//                printSchedule();
+                printSchedule();
                 baseRecyclerViewAdapter.reloadData(LocalCalendar.getAllCalendarEvent(getApplicationContext()));
                 break;
             case R.id.openLocalCalendarScheduleDetail:
@@ -102,7 +88,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             Log.i("temptemp", temp.get(i).toString());
         }
     }
-
 
 
 }
