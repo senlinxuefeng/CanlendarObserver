@@ -10,6 +10,7 @@ public class ScheduleToDo implements Serializable {
     public String pNote;
     public String startDate;
     public String endDate;
+    public String event;
 
     public String getId() {
         return id;
@@ -49,6 +50,14 @@ public class ScheduleToDo implements Serializable {
 
     public void setEndDate(String endDate) {
         this.endDate = endDate;
+    }
+
+    public String getEvent() {
+        return event;
+    }
+
+    public void setEvent(String event) {
+        this.event = event;
     }
 
     @Override

@@ -25,5 +25,11 @@
         android:layout_height="wrap_content"
         android:text="打印本地日历日程的详情" />
 
+    <android.support.v7.app.AlertController.RecycleListView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+    </android.support.v7.app.AlertController.RecycleListView>
+
 
 </LinearLayout>

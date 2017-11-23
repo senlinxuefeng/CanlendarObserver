@@ -209,6 +209,7 @@ public class LocalCalendar {
                     scheduleToDo.setpNote(eventCursor.getString(eventCursor.getColumnIndex(CalendarContract.Events.DESCRIPTION)));
                     scheduleToDo.setStartDate(eventCursor.getLong(eventCursor.getColumnIndex(CalendarContract.Events.DTSTART)) + "");
                     scheduleToDo.setEndDate(eventCursor.getLong(eventCursor.getColumnIndex(CalendarContract.Events.DTEND)) + "");
+//                    scheduleToDo.setEvent(eventCursor.getString(eventCursor.getColumnIndex(CalendarContract.Events.SYNC_EVENTS)));
 
                     calendarEvents.add(scheduleToDo);
                 }
