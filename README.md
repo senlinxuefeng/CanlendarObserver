@@ -15,10 +15,11 @@ ContentResolver直译为内容解析器，Android中程序间数据的共享是�
 
 Cursor cursor = contentResolver.query(android.provider.ContactsContract.Contacts.CONTENT_URI,  
                 null, null, null, null); 
-1
-2
+                
 android官方文档： 
+
 public final Cursor query (Uri uri, String[] projection,String selection,String[] selectionArgs, String sortOrder)
+
 第一个参数，uri，上面我们提到了Android提供内容的叫Provider，那么在Android中怎么区分各个Provider？有提供联系人的，有提供图片的等等。所以就需要有一个唯一的标识来标识这个Provider，Uri就是这个标识，
 android.provider.ContactsContract.Contacts.CONTENT_URI就是提供联系人的内容提供者，可惜这个内容提供者提供的数据很少。
 
@@ -26,8 +27,7 @@ android.provider.ContactsContract.Contacts.CONTENT_URI就是提供联系人的�
 
 Cursor cursor = contentResolver.query(android.provider.ContactsContract.Contacts.CONTENT_URI,  
     new String[]{android.provider.ContactsContract.Contacts.DISPLAY_NAME}, null, null, null);
-1
-2
+    
 当然，下面打印的你就只能显示NAME了，因为你返回的结果不包含ID。用null表示返回Provider的所有内容（列Column）。
 
 第三个参数，selection，设置条件，相当于SQL语句中的where。null表示不进行筛选。如果我们只想返回名称为张三的数据，第三个参数应该设置为：
@@ -35,27 +35,20 @@ Cursor cursor = contentResolver.query(android.provider.ContactsContract.Contacts
 Cursor cursor = contentResolver.query(android.provider.ContactsContract.Contacts.CONTENT_URI,  
     new String[]{android.provider.ContactsContract.Contacts.DISPLAY_NAME},  
     android.provider.ContactsContract.Contacts.DISPLAY_NAME + "='张三'", null, null); 
-1
-2
-3
+    
 第四个参数，selectionArgs，这个参数是要配合第三个参数使用的，如果你在第三个参数里面有？，那么你在selectionArgs写的数据就会替换掉？
 
     Cursor cursor = contentResolver.query(android.provider.ContactsContract.Contacts.CONTENT_URI,  
         new String[]{android.provider.ContactsContract.Contacts.DISPLAY_NAME},  
         android.provider.ContactsContract.Contacts.DISPLAY_NAME + "=?",  
                     new String[]{"张三"}, null);  
-1
-2
-3
-4
+                    
 效果和上面一句的效果一样。
 
 第五个参数，sortOrder，按照什么进行排序，相当于SQL语句中的Order by。如果想要结果按照ID的降序排列：
 
 Cursor cursor = contentResolver.query(android.provider.ContactsContract.Contacts.CONTENT_URI,  
                 null, null,null, android.provider.ContactsContract.Contacts._ID + " DESC");
-1
-2
-+"DESC"降序，其实默认排序是升序，+"ASC"写不写效果都一样.
+                +"DESC"降序，其实默认排序是升序，+"ASC"写不写效果都一样.
 
 参考文章：Android 学习笔记 Contacts(一) ContentResolver query 参数详解
