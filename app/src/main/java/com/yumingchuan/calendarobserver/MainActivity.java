@@ -76,7 +76,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void requestPermission() {
         if (isDeniedPermission()) {
-            PermissionUtils.requestPermissions(this, 11, new String[]{Manifest.permission.READ_CALENDAR, Manifest.permission.WRITE_CALENDAR}, new PermissionUtils.OnPermissionListener() {
+            PermissionUtils.requestPermissions(this, 11, new String[]{Manifest.permission.READ_CALENDAR}, new PermissionUtils.OnPermissionListener() {
                 @Override
                 public void onPermissionGranted() {
                     LogUtils.i("sdfdsf", "onPermissionGranted");
@@ -92,21 +92,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private boolean isDeniedPermission() {
-        return PermissionUtils.hasAlwaysDeniedPermission(this, Manifest.permission.READ_CALENDAR, Manifest.permission.WRITE_CALENDAR);
+        return PermissionUtils.hasAlwaysDeniedPermission(this, Manifest.permission.READ_CALENDAR);
     }
 
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btnSchedule:
-                if (isDeniedPermission()) {
+                if (!isDeniedPermission()) {
                     requestPermission();
                 } else {
                     LocalCalendar.addCalendarEvent(getApplicationContext(), "添加第" + baseRecyclerViewAdapter.getItemCount() + "条日程数据到日历", "添加第" + baseRecyclerViewAdapter.getItemCount() + "条日程描述到日历", Calendar.getInstance().getTime().getTime());
                 }
                 break;
             case R.id.printSchedule:
-                if (isDeniedPermission()) {
+                if (!isDeniedPermission()) {
                     requestPermission();
                 } else {
                     baseRecyclerViewAdapter.reloadData(LocalCalendar.getAllCalendarEvent(getApplicationContext()));
