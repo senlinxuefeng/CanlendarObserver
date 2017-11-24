@@ -230,8 +230,11 @@ public class LocalCalendar {
 
     /**
      * 打开日历日程数据的详情
+     *
+     * @param cnt
+     * @param id
      */
-    public static void openCalendarEventDetail(Context cnt) {
+    public static void openCalendarEventDetail(Context cnt, int id) {
 
         //具体的一条日历数据
 //        id=2   pTitle=1   pNote=null   startDate=1511488800000   endDate=1511492400000
@@ -241,7 +244,7 @@ public class LocalCalendar {
             t_intent.addCategory(Intent.CATEGORY_DEFAULT);
             t_intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK
                     | Intent.FLAG_ACTIVITY_TASK_ON_HOME);
-            Uri uri = ContentUris.withAppendedId(CalendarContract.Events.CONTENT_URI, 2);
+            Uri uri = ContentUris.withAppendedId(CalendarContract.Events.CONTENT_URI, id);
             t_intent.setData(uri);
             cnt.startActivity(t_intent);
         } catch (Exception e) {

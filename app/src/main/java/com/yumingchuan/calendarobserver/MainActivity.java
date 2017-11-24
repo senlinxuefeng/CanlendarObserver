@@ -65,6 +65,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         };
         recyclerView.setAdapter(baseRecyclerViewAdapter);
+        baseRecyclerViewAdapter.setOnItemClickListener(new BaseRecyclerViewAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(Object object, int position) {
+                ScheduleToDo scheduleToDo = (ScheduleToDo) object;
+                LocalCalendar.openCalendarEventDetail(getApplicationContext(), Integer.parseInt(scheduleToDo.getId()));
+            }
+        });
+
     }
 
     private void addListener() {
@@ -128,7 +136,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             Log.i("temptemp", temp.get(i).toString());
         }
     }
-
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
