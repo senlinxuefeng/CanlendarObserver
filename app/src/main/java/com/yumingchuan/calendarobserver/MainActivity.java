@@ -10,6 +10,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.blankj.utilcode.util.PermissionUtils;
+
 import java.util.Calendar;
 import java.util.List;
 
@@ -29,10 +31,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-
         addListener();
 
         initAdapter();
+
+        requestPermission();
+
     }
 
     private void initAdapter() {
@@ -58,23 +62,51 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void addListener() {
         findViewById(R.id.btnSchedule).setOnClickListener(this);
         findViewById(R.id.printSchedule).setOnClickListener(this);
-        findViewById(R.id.openLocalCalendarScheduleDetail).setOnClickListener(this);
+
     }
 
+
+    private void requestPermission() {
+
+        if (!isHavePermission()) {
+            PermissionUtils.requestPermissions(this, 11, new String[]{"android.permission.READ_CALENDAR", "android.permission.WRITE_CALENDAR"}, new PermissionUtils.OnPermissionListener() {
+                @Override
+                public void onPermissionGranted() {
+
+                }
+
+                @Override
+                public void onPermissionDenied(String[] deniedPermissions) {
+
+                }
+            });
+        }
+    }
+
+    private boolean isHavePermission() {
+        return PermissionUtils.hasAlwaysDeniedPermission(this, "android.permission.READ_CALENDAR", "android.permission.WRITE_CALENDAR");
+    }
 
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btnSchedule:
-                LocalCalendar.addCalendarEvent(getApplicationContext(), "添加第" + baseRecyclerViewAdapter.getItemCount() + "条日程数据到日历", "日程内容", Calendar.getInstance().getTime().getTime());
+                if (!isHavePermission()) {
+                    requestPermission();
+                } else {
+                    LocalCalendar.addCalendarEvent(getApplicationContext(), "添加第" + baseRecyclerViewAdapter.getItemCount() + "条日程数据到日历", "添加第" + baseRecyclerViewAdapter.getItemCount() + "条日程描述到日历", Calendar.getInstance().getTime().getTime());
+                }
                 break;
             case R.id.printSchedule:
-                printSchedule();
-                baseRecyclerViewAdapter.reloadData(LocalCalendar.getAllCalendarEvent(getApplicationContext()));
+                if (!isHavePermission()) {
+                    requestPermission();
+                } else {
+                    baseRecyclerViewAdapter.reloadData(LocalCalendar.getAllCalendarEvent(getApplicationContext()));
+                }
                 break;
-            case R.id.openLocalCalendarScheduleDetail:
-                LocalCalendar.openCalendarEventDetail(getApplicationContext());
-                break;
+//            case R.id.openLocalCalendarScheduleDetail:
+//                LocalCalendar.openCalendarEventDetail(getApplicationContext());
+//                break;
 
             default:
 
