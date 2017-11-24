@@ -3,8 +3,11 @@
 
 本人现在任职于 [日事清](https://www.rishiqing.com/),由于我们的禁品包括滴答清单等，看到禁品有对应的功能，是吧，我们也不能掉链子，那么需求就来了，照着他们做，他们有什么我们有什么，那么到底是什么呢？
 
+#效果图展示
 
-#技术前言
+![](https://github.com/senlinxuefeng/CalendarObserver/screenshorcuts/6666.gif)<br>
+
+##技术前言
 
 遇到查询系统联系人的一个问题，对query()方法理解的不到位，现在总结整理一下！
 
