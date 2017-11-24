@@ -5,9 +5,9 @@
 
 #效果图展示
 
-![](https://github.com/senlinxuefeng/RSQMonthCalendar/raw/master/picture/monthcalendar2.gif)<br>
 
-![](https://github.com/senlinxuefeng/CalendarObserver/screenshorcuts/6666.gif)<br>
+![](https://github.com/senlinxuefeng/CanlendarSchedule/raw/master/screenshorcuts/6666.gif)<br>
+
 
 ##技术前言
 
