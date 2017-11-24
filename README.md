@@ -5,7 +5,7 @@
 
 #效果图展示
 
-![](https://github.com/senlinxuefeng/CalendarObserver/screenshorcuts/6666.gif)<br>
+![](https://github.com/senlinxuefeng/CanlendarSchedule/screenshorcuts/6666.gif)<br>
 
 ##技术前言
 
