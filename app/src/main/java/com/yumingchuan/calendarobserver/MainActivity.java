@@ -1,6 +1,8 @@
 package com.yumingchuan.calendarobserver;
 
+import android.Manifest;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -10,7 +12,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.blankj.utilcode.util.EmptyUtils;
+import com.blankj.utilcode.util.LogUtils;
 import com.blankj.utilcode.util.PermissionUtils;
+import com.blankj.utilcode.util.ToastUtils;
+import com.blankj.utilcode.util.Utils;
 
 import java.util.Calendar;
 import java.util.List;
@@ -30,6 +36,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        Utils.init(getApplication());
 
         addListener();
 
@@ -67,38 +75,38 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
     private void requestPermission() {
-
-        if (!isHavePermission()) {
-            PermissionUtils.requestPermissions(this, 11, new String[]{"android.permission.READ_CALENDAR", "android.permission.WRITE_CALENDAR"}, new PermissionUtils.OnPermissionListener() {
+        if (isDeniedPermission()) {
+            PermissionUtils.requestPermissions(this, 11, new String[]{Manifest.permission.READ_CALENDAR, Manifest.permission.WRITE_CALENDAR}, new PermissionUtils.OnPermissionListener() {
                 @Override
                 public void onPermissionGranted() {
-
+                    LogUtils.i("sdfdsf", "onPermissionGranted");
                 }
 
                 @Override
                 public void onPermissionDenied(String[] deniedPermissions) {
-
+                    ToastUtils.showShort("需要您手动开启权限");
+                    LogUtils.i("sdfdsf", EmptyUtils.isEmpty(deniedPermissions) ? "null" : deniedPermissions.toString());
                 }
             });
         }
     }
 
-    private boolean isHavePermission() {
-        return PermissionUtils.hasAlwaysDeniedPermission(this, "android.permission.READ_CALENDAR", "android.permission.WRITE_CALENDAR");
+    private boolean isDeniedPermission() {
+        return PermissionUtils.hasAlwaysDeniedPermission(this, Manifest.permission.READ_CALENDAR, Manifest.permission.WRITE_CALENDAR);
     }
 
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btnSchedule:
-                if (!isHavePermission()) {
+                if (isDeniedPermission()) {
                     requestPermission();
                 } else {
                     LocalCalendar.addCalendarEvent(getApplicationContext(), "添加第" + baseRecyclerViewAdapter.getItemCount() + "条日程数据到日历", "添加第" + baseRecyclerViewAdapter.getItemCount() + "条日程描述到日历", Calendar.getInstance().getTime().getTime());
                 }
                 break;
             case R.id.printSchedule:
-                if (!isHavePermission()) {
+                if (isDeniedPermission()) {
                     requestPermission();
                 } else {
                     baseRecyclerViewAdapter.reloadData(LocalCalendar.getAllCalendarEvent(getApplicationContext()));
@@ -122,4 +130,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        PermissionUtils.onRequestPermissionsResult(this, requestCode, permissions, grantResults);
+    }
 }
+
