@@ -49,6 +49,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         requestPermission();
 
+        LocalCalendar.getAll(getApplicationContext());
+
     }
 
     private void initAdapter() {

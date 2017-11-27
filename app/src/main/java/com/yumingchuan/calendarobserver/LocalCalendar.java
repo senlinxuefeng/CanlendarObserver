@@ -51,6 +51,67 @@ public class LocalCalendar {
     }
 
 
+    /**
+     * 获取所有日历的名字
+     *
+     * @param context
+     */
+    public static void getAllCalendarNames(Context context) {
+        String uri = "content://com.android.calendar/calendars";
+//        查询手机日历：
+        Uri calendars = Uri.parse(uri);
+        Cursor managedCursor = context.getContentResolver().query(calendars, null, null, null, null);
+
+
+        String[] tempNames = managedCursor.getColumnNames();
+
+
+        for (int i = 0; i < tempNames.length; i++) {
+            // LogUtils.i(tempNames[i]);
+        }
+
+
+        if (managedCursor.moveToFirst()) {
+            do {
+
+//                calendar_displayName
+
+//                int idColumn = managedCursor.getColumnIndex("calendar_displayName");
+//                String id = managedCursor.getString(idColumn);//获取系统日历的id
+
+                Log.i("idid", managedCursor.getString(managedCursor.getColumnIndex("calendar_displayName")));
+
+
+            } while (managedCursor.moveToNext());
+        }
+
+
+    }
+//
+//    private void displayRecords() {
+//        //该数组中包含了所有要返回的字段
+//        String columns[] = new String[] { People.NAME, People.NUMBER };
+//        Uri mContacts = People.CONTENT_URI;
+//        Cursor cur = managedQuery(
+//                mContacts,
+//                columns,  // 要返回的数据字段
+//                null,          // WHERE子句
+//                null,         // WHERE 子句的参数
+//                null         // Order-by子句
+//        );
+//        if (cur.moveToFirst()) {
+//            String name = null;
+//            String phoneNo = null;
+//            do {
+//                // 获取字段的值
+//                name = cur.getString(cur.getColumnIndex(People.NAME));
+//                phoneNo = cur.getString(cur.getColumnIndex(People.NUMBER));
+//                Toast.makeText(this, name + ” ” + phoneNo, Toast.LENGTH_LONG).show();
+//            } while (cur.moveToNext());
+//        }
+//    }
+
+
     private static String CALENDARS_NAME = "test";
     private static String CALENDARS_ACCOUNT_NAME = "test@gmail.com";
     private static String CALENDARS_ACCOUNT_TYPE = "com.android.exchange";
