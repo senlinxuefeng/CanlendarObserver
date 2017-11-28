@@ -59,4 +59,7 @@ android.provider.ContactsContract.Contacts.CONTENT_URI就是提供联系人的�
                     null, null,null, android.provider.ContactsContract.Contacts._ID + " DESC");
 
  "DESC"降序，其实默认排序是升序，+"ASC"写不写效果都一样.
+ 
+ ## 详细的资料可以参考
+    http://blog.csdn.net/Wtoria/article/details/52054000
 

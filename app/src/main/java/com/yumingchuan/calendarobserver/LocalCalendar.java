@@ -12,6 +12,8 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.blankj.utilcode.util.LogUtils;
+
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -67,18 +69,12 @@ public class LocalCalendar {
 
 
         for (int i = 0; i < tempNames.length; i++) {
-            // LogUtils.i(tempNames[i]);
+             LogUtils.i(tempNames[i]);
         }
 
 
         if (managedCursor.moveToFirst()) {
             do {
-
-//                calendar_displayName
-
-//                int idColumn = managedCursor.getColumnIndex("calendar_displayName");
-//                String id = managedCursor.getString(idColumn);//获取系统日历的id
-
                 Log.i("idid", managedCursor.getString(managedCursor.getColumnIndex("calendar_displayName")));
 
 
@@ -87,29 +83,6 @@ public class LocalCalendar {
 
 
     }
-//
-//    private void displayRecords() {
-//        //该数组中包含了所有要返回的字段
-//        String columns[] = new String[] { People.NAME, People.NUMBER };
-//        Uri mContacts = People.CONTENT_URI;
-//        Cursor cur = managedQuery(
-//                mContacts,
-//                columns,  // 要返回的数据字段
-//                null,          // WHERE子句
-//                null,         // WHERE 子句的参数
-//                null         // Order-by子句
-//        );
-//        if (cur.moveToFirst()) {
-//            String name = null;
-//            String phoneNo = null;
-//            do {
-//                // 获取字段的值
-//                name = cur.getString(cur.getColumnIndex(People.NAME));
-//                phoneNo = cur.getString(cur.getColumnIndex(People.NUMBER));
-//                Toast.makeText(this, name + ” ” + phoneNo, Toast.LENGTH_LONG).show();
-//            } while (cur.moveToNext());
-//        }
-//    }
 
 
     private static String CALENDARS_NAME = "test";
