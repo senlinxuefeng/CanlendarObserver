@@ -49,7 +49,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         requestPermission();
 
-        LocalCalendar.getAllCalendarNames(getApplicationContext());
+        LocalCalendarEventUtils.getAllCalendarNames(getApplicationContext());
 
     }
 
@@ -75,7 +75,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void onItemClick(Object object, int position) {
                 ScheduleToDo scheduleToDo = (ScheduleToDo) object;
-                LocalCalendar.openCalendarEventDetail(getApplicationContext(), Integer.parseInt(scheduleToDo.getId()));
+                LocalCalendarEventUtils.openCalendarEventDetail(getApplicationContext(), Integer.parseInt(scheduleToDo.getId()));
             }
         });
 
@@ -116,19 +116,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 if (!isDeniedPermission()) {
                     requestPermission();
                 } else {
-                    LocalCalendar.addCalendarEvent(getApplicationContext(), "添加第" + baseRecyclerViewAdapter.getItemCount() + "条日程数据到日历", "添加第" + baseRecyclerViewAdapter.getItemCount() + "条日程描述到日历", Calendar.getInstance().getTime().getTime());
+                    LocalCalendarEventUtils.addCalendarEvent(getApplicationContext(), "添加第" + baseRecyclerViewAdapter.getItemCount() + "条日程数据到日历", "添加第" + baseRecyclerViewAdapter.getItemCount() + "条日程描述到日历", Calendar.getInstance().getTime().getTime());
                 }
                 break;
             case R.id.printSchedule:
                 if (!isDeniedPermission()) {
                     requestPermission();
                 } else {
-                    baseRecyclerViewAdapter.reloadData(LocalCalendar.getAllCalendarEvent(getApplicationContext()));
+                    baseRecyclerViewAdapter.reloadData(LocalCalendarEventUtils.getAllCalendarEvent(getApplicationContext()));
                 }
                 break;
-//            case R.id.openLocalCalendarScheduleDetail:
-//                LocalCalendar.openCalendarEventDetail(getApplicationContext());
-//                break;
 
             default:
 
@@ -137,7 +134,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void printSchedule() {
-        List<ScheduleToDo> temp = LocalCalendar.getAllCalendarEvent(getApplicationContext());
+        List<ScheduleToDo> temp = LocalCalendarEventUtils.getAllCalendarEvent(getApplicationContext());
         for (int i = 0; i < temp.size(); i++) {
             Log.i("temptemp", temp.get(i).toString());
         }

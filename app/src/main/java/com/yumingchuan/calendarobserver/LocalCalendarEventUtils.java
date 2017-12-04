@@ -27,7 +27,7 @@ import java.util.TimeZone;
  * Created by yumingchuan on 2017/11/23.
  */
 
-public class LocalCalendar {
+public class LocalCalendarEventUtils {
 
     private static String CALANDER_URL = "content://com.android.calendar/calendars";
     private static String CALANDER_EVENT_URL = "content://com.android.calendar/events";
@@ -69,13 +69,17 @@ public class LocalCalendar {
 
 
         for (int i = 0; i < tempNames.length; i++) {
-             LogUtils.i(tempNames[i]);
+            LogUtils.i(tempNames[i]);
         }
 
 
         if (managedCursor.moveToFirst()) {
             do {
-                Log.i("idid", managedCursor.getString(managedCursor.getColumnIndex("calendar_displayName")));
+
+
+                Log.i("idid", managedCursor.getString(managedCursor.getColumnIndex(CalendarContract.Calendars._ID)));
+                Log.i("idid", managedCursor.getString(managedCursor.getColumnIndex(CalendarContract.Calendars.ACCOUNT_NAME)));
+                Log.i("idid", managedCursor.getString(managedCursor.getColumnIndex(CalendarContract.Calendars.CALENDAR_DISPLAY_NAME)));
 
 
             } while (managedCursor.moveToNext());
@@ -210,26 +214,47 @@ public class LocalCalendar {
         }
     }
 
+
+    /**
+     * 获取所有日历的所有事件
+     *
+     * @param context
+     * @return
+     */
     public static List<ScheduleToDo> getAllCalendarEvent(Context context) {
+
 
         List<ScheduleToDo> calendarEvents = new ArrayList<>();
 
         try {
+
+            String selection = "((" + CalendarContract.Calendars.ACCOUNT_NAME + " = ?) AND ("
+                    + CalendarContract.Calendars.ACCOUNT_TYPE + " = ?))";
+
+            String[] selectionArgs = new String[]{"sampleuser@gmail.com", "com.google"};
+
+
             long startTime = dateFormat.parse(new SimpleDateFormat("yyyy-MM-dd").format(new Date()) + " 00:00:00").getTime();
             long endTime = startTime + 1000 * 60 * 60 * 24;
 
+//            12-04 14:53:41.917 2052-2052/? I/idid: Local account
+//            12-04 14:53:41.917 2052-2052/? I/idid: Local calendar
+//            12-04 14:53:41.917 2052-2052/? I/idid: Birthday
+//            12-04 14:53:41.917 2052-2052/? I/idid: Birthday
+
+//            WHERE (lastSynced = 0 AND (dtstart>1512316800000 and dtend<1512403200000 and account_name= Local calendar))
+
             // String[] selectionArgs = {android.provider.CalendarContract.Events.DTSTART + ">" + 1, android.provider.CalendarContract.Events.DTEND + "<" + 1};
 //        String selection = android.provider.CalendarContract.Events.DTSTART + "<" + 11119910011111L;
-            String selection = android.provider.CalendarContract.Events.DTSTART + ">" + startTime + " and "
-                    + android.provider.CalendarContract.Events.DTEND + "<" + endTime;
+            String selection1 = android.provider.CalendarContract.Events.DTSTART + ">" + startTime + " and "
+                    + android.provider.CalendarContract.Events.DTEND + "<" + endTime
+                    + " and " + CalendarContract.Events.CALENDAR_ID + "= 1";
+
 
             Log.i("temptemp", startTime + "    " + endTime);
 
+            Cursor eventCursor = context.getContentResolver().query(Uri.parse(CALANDER_EVENT_URL), null, selection1, null, null);
 
-            String testSelection = CalendarContract.Events.TITLE + "='1'";
-
-
-            Cursor eventCursor = context.getContentResolver().query(Uri.parse(CALANDER_EVENT_URL), null, selection, null, null);
             try {
                 if (eventCursor == null)//查询返回空值
                     return calendarEvents;
