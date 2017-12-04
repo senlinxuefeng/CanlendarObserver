@@ -12,6 +12,8 @@ public class ScheduleToDo implements Serializable {
     public String endDate;
     public String event;
 
+    private boolean isLocalCalendarSchedule;
+
     public String getId() {
         return id;
     }
@@ -58,6 +60,14 @@ public class ScheduleToDo implements Serializable {
 
     public void setEvent(String event) {
         this.event = event;
+    }
+
+    public boolean isLocalCalendarSchedule() {
+        return isLocalCalendarSchedule;
+    }
+
+    public void setLocalCalendarSchedule(boolean localCalendarSchedule) {
+        isLocalCalendarSchedule = localCalendarSchedule;
     }
 
     @Override

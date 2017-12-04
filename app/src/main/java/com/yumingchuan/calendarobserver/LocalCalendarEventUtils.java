@@ -13,6 +13,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.blankj.utilcode.util.LogUtils;
+import com.blankj.utilcode.util.SPUtils;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -80,6 +81,14 @@ public class LocalCalendarEventUtils {
                 Log.i("idid", managedCursor.getString(managedCursor.getColumnIndex(CalendarContract.Calendars._ID)));
                 Log.i("idid", managedCursor.getString(managedCursor.getColumnIndex(CalendarContract.Calendars.ACCOUNT_NAME)));
                 Log.i("idid", managedCursor.getString(managedCursor.getColumnIndex(CalendarContract.Calendars.CALENDAR_DISPLAY_NAME)));
+
+
+                try {
+                    Log.i("idid", dateFormat_yyyyMMdd.parse("20171204").getTime() + "");
+                    Log.i("idid", dateFormat_yyyy_MM_dd_hh_mm_ss.parse("2017-12-04 00:00:00").getTime() + "");
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
 
 
             } while (managedCursor.moveToNext());
@@ -183,7 +192,9 @@ public class LocalCalendarEventUtils {
         }
     }
 
-    private static DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd 00:00:00");
+    private static DateFormat dateFormat_yyyy_MM_dd_hh_mm_ss = new SimpleDateFormat("yyyy-MM-dd 00:00:00");
+    private static DateFormat dateFormat_yyyyMMdd = new SimpleDateFormat("yyyyMMdd");
+    private static long ONE_DAY_TIME = 1000 * 60 * 60 * 24;
 
 
     public static void deleteCalendarEvent(Context context, String title) {
@@ -234,7 +245,7 @@ public class LocalCalendarEventUtils {
             String[] selectionArgs = new String[]{"sampleuser@gmail.com", "com.google"};
 
 
-            long startTime = dateFormat.parse(new SimpleDateFormat("yyyy-MM-dd").format(new Date()) + " 00:00:00").getTime();
+            long startTime = dateFormat_yyyyMMdd.parse(new SimpleDateFormat("yyyyMMdd").format(new Date()) + " 00:00:00").getTime();
             long endTime = startTime + 1000 * 60 * 60 * 24;
 
 //            12-04 14:53:41.917 2052-2052/? I/idid: Local account
@@ -284,6 +295,64 @@ public class LocalCalendarEventUtils {
         }
 
         return calendarEvents;
+    }
+
+
+    /**
+     * @param context
+     * @param someDate 开始日期 yyyyMMdd
+     * @return
+     */
+    public static List<ScheduleToDo> getOneDayCalendarEvent(Context context, String someDate) {
+        List<ScheduleToDo> calendarEvents = new ArrayList<>();
+        Cursor eventCursor = context.getContentResolver().query(Uri.parse(CALANDER_EVENT_URL), null, getOneDaySelection(someDate, someDate), null, null);
+        try {
+            if (eventCursor == null)//查询返回空值
+                return calendarEvents;
+            if (eventCursor.getCount() > 0) {
+                //遍历所有事件，找到title跟需要查询的title一样的项
+                for (eventCursor.moveToFirst(); !eventCursor.isAfterLast(); eventCursor.moveToNext()) {
+                    ScheduleToDo scheduleToDo = new ScheduleToDo();
+                    scheduleToDo.setLocalCalendarSchedule(true);
+                    scheduleToDo.setId(eventCursor.getInt(eventCursor.getColumnIndex(CalendarContract.Calendars._ID)) + "");
+                    scheduleToDo.setpTitle(eventCursor.getString(eventCursor.getColumnIndex(CalendarContract.Events.TITLE)));
+                    scheduleToDo.setpNote(eventCursor.getString(eventCursor.getColumnIndex(CalendarContract.Events.DESCRIPTION)));
+                    calendarEvents.add(scheduleToDo);
+                }
+            }
+        } finally {
+            if (eventCursor != null) {
+                eventCursor.close();
+            }
+        }
+        return calendarEvents;
+    }
+
+    private static String getOneDaySelection(String startDate, String endDate) {
+        String tempStr = "";
+        String selection = "";
+
+        try {
+            long startTime = dateFormat_yyyyMMdd.parse(startDate).getTime();
+            long endTime = dateFormat_yyyyMMdd.parse(endDate).getTime() + ONE_DAY_TIME;
+
+            selection = android.provider.CalendarContract.Events.DTSTART + ">" + startTime + " and "
+                    + android.provider.CalendarContract.Events.DTEND + "<" + endTime;
+
+
+            String calendarId = CalendarContract.Events.CALENDAR_ID;
+            String noContainCalendarIds = SPUtils.getInstance().getString("noContainCalendarIds", "");
+            String[] noContainCalendarIdArrays = noContainCalendarIds.split(",");
+
+            for (int i = 0; i < noContainCalendarIdArrays.length; i++) {
+                tempStr += " and " + calendarId + " != " + noContainCalendarIdArrays[i];
+            }
+        } catch (ParseException e) {
+            e.printStackTrace();
+        } finally {
+            selection += tempStr;
+        }
+        return selection;
     }
 
 
