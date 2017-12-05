@@ -64,4 +64,6 @@ android.provider.ContactsContract.Contacts.CONTENT_URI就是提供联系人的�
     http://blog.csdn.net/Wtoria/article/details/52054000
     
     http://blog.csdn.net/fk_null/article/details/17026631
+    
+    http://blog.csdn.net/super_spy/article/details/51276618
 
