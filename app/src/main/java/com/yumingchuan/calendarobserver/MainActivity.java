@@ -123,7 +123,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 if (!isDeniedPermission()) {
                     requestPermission();
                 } else {
-                    baseRecyclerViewAdapter.reloadData(LocalCalendarEventUtils.getAllCalendarEvent(getApplicationContext()));
+                    baseRecyclerViewAdapter.reloadData(LocalCalendarEventUtils.getOneDayCalendarEvent(getApplicationContext(), "20171205"));
                 }
                 break;
 

@@ -293,7 +293,6 @@ public class LocalCalendarEventUtils {
         } catch (ParseException e) {
             e.printStackTrace();
         }
-
         return calendarEvents;
     }
 
@@ -345,14 +344,32 @@ public class LocalCalendarEventUtils {
             String[] noContainCalendarIdArrays = noContainCalendarIds.split(",");
 
             for (int i = 0; i < noContainCalendarIdArrays.length; i++) {
-                tempStr += " and " + calendarId + " != " + noContainCalendarIdArrays[i];
+                if (i == 0) {
+                    if (noContainCalendarIdArrays.length == 1) {
+//                        tempStr += " and " + calendarId + " = " + noContainCalendarIdArrays[i];
+                        tempStr += " and " + calendarId + " = " + 1;
+                    } else {
+                        tempStr += " and ( " + calendarId + " = " + noContainCalendarIdArrays[i];
+                    }
+                } else if (i == noContainCalendarIdArrays.length - 1) {
+                    tempStr += " OR " + calendarId + " = " + noContainCalendarIdArrays[i] + " )";
+                } else {
+                    tempStr += " OR " + calendarId + " = " + noContainCalendarIdArrays[i];
+                }
             }
+
+
         } catch (ParseException e) {
             e.printStackTrace();
         } finally {
             selection += tempStr;
         }
-        return selection;
+
+
+        LogUtils.i(selection);
+
+//        return selection;
+        return "dtstart>1512403200000 and dtend<1512489600000 and ( calendar_id = 0 OR calendar_id = 2 )";
     }
 
 
@@ -373,6 +390,8 @@ public class LocalCalendarEventUtils {
             t_intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK
                     | Intent.FLAG_ACTIVITY_TASK_ON_HOME);
             Uri uri = ContentUris.withAppendedId(CalendarContract.Events.CONTENT_URI, id);
+//            t_intent.putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, scheduleToDo.getLocalCalendarStartTime());
+//            t_intent.putExtra(CalendarContract.EXTRA_EVENT_END_TIME, scheduleToDo.getLocalCalendarEndTime());
             t_intent.setData(uri);
             cnt.startActivity(t_intent);
         } catch (Exception e) {
