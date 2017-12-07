@@ -191,7 +191,7 @@ public class LocalCalendarEventUtils {
         }
     }
 
-    private static DateFormat dateFormat_yyyy_MM_dd_hh_mm_ss = new SimpleDateFormat("yyyy-MM-dd 00:00:00");
+    private static DateFormat dateFormat_yyyy_MM_dd_hh_mm_ss = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     private static DateFormat dateFormat_yyyyMMdd = new SimpleDateFormat("yyyyMMdd");
     private static long ONE_DAY_TIME = 1000 * 60 * 60 * 24;
 
@@ -303,9 +303,7 @@ public class LocalCalendarEventUtils {
      */
     public static List<ScheduleToDo> getOneDayCalendarEvent(Context context, String someDate) {
         List<ScheduleToDo> calendarEvents = new ArrayList<>();
-
         try {
-
             int calendarEventCount = -1000;
             Cursor eventCursor = context.getContentResolver().query(Uri.parse(CALANDER_EVENT_URL), null, getOneDaySelection(someDate, someDate), null, null);
             try {
@@ -321,8 +319,26 @@ public class LocalCalendarEventUtils {
                         scheduleToDo.setpTitle(eventCursor.getString(eventCursor.getColumnIndex(CalendarContract.Events.TITLE)));
                         scheduleToDo.setpNote(eventCursor.getString(eventCursor.getColumnIndex(CalendarContract.Events.DESCRIPTION)));
 
+
                         scheduleToDo.setLocalCalendarStartTime(eventCursor.getLong(eventCursor.getColumnIndex(CalendarContract.Events.DTSTART)));
                         scheduleToDo.setLocalCalendarEndTime(eventCursor.getLong(eventCursor.getColumnIndex(CalendarContract.Events.DTEND)));
+
+                        scheduleToDo.setAllDayCalendarTask(eventCursor.getInt(eventCursor.getColumnIndex(CalendarContract.Events.ALL_DAY)) == 1);
+
+
+//                        String RDATE = eventCursor.getString(eventCursor.getColumnIndex(CalendarContract.Events.RDATE));//CalendarContract.Events.RDATE
+//
+//                        LogUtils.i(RDATE);
+
+
+                        String LAST_DATE = eventCursor.getString(eventCursor.getColumnIndex(CalendarContract.Events.LAST_DATE));//CalendarContract.Events.RDATE
+
+
+                        Calendar calendar = Calendar.getInstance();
+
+                        calendar.setTimeInMillis(Long.parseLong(LAST_DATE));
+
+                        LogUtils.i(LAST_DATE + "    :::    " + scheduleToDo.pTitle + "   :    " + dateFormat_yyyy_MM_dd_hh_mm_ss.format(calendar.getTime()));
 
                         calendarEvents.add(scheduleToDo);
                     }
@@ -369,7 +385,7 @@ public class LocalCalendarEventUtils {
                     }
                 }
             } else {
-               // tempStr += " and " + calendarId + " = -1000";
+                // tempStr += " and " + calendarId + " = -1000";
             }
 
         } catch (ParseException e) {
@@ -381,7 +397,55 @@ public class LocalCalendarEventUtils {
 
         LogUtils.i(selection);
 
-        return selection;
+
+//        return selection;
+        return "calendar_id = 1";
+    }
+
+
+    private static String getOneDaySelection(String startDate, String endDate) {
+        String tempStr = "";
+        String selection1 = "";
+        String selection2 = "";
+
+        try {
+            long startTime = dateFormat_yyyyMMdd.parse(startDate).getTime();
+            long endTime = dateFormat_yyyyMMdd.parse(endDate).getTime() + ONE_DAY_TIME;
+
+            selection1 = android.provider.CalendarContract.Events.DTSTART + " >= " + startTime + " and "
+                    + android.provider.CalendarContract.Events.DTEND + " <= " + endTime;
+
+            String calendarId = CalendarContract.Events.CALENDAR_ID;
+            String containCalendarIds = SPUtils.getInstance().getString("containCalendarIds", "");
+            String[] noContainCalendarIdArrays = EmptyUtils.isEmpty(containCalendarIds) ? null : containCalendarIds.split(",");
+
+            if (!EmptyUtils.isEmpty(noContainCalendarIdArrays)) {
+                for (int i = 0; i < noContainCalendarIdArrays.length; i++) {
+                    if (i == 0) {
+                        if (noContainCalendarIdArrays.length == 1) {
+                            tempStr += " and " + calendarId + " = " + noContainCalendarIdArrays[i];
+                        } else {
+                            tempStr += " and ( " + calendarId + " = " + noContainCalendarIdArrays[i];
+                        }
+                    } else if (i == noContainCalendarIdArrays.length - 1) {
+                        tempStr += " OR " + calendarId + " = " + noContainCalendarIdArrays[i] + " )";
+                    } else {
+                        tempStr += " OR " + calendarId + " = " + noContainCalendarIdArrays[i];
+                    }
+                }
+            } else {
+                //tempStr += " and " + calendarId + " = -1000";
+            }
+            selection2 = CalendarContract.Events.ALL_DAY + " =1 AND " + CalendarContract.Events.LAST_DATE + " >= " + (startTime + ONE_DAY_TIME) + " AND " + android.provider.CalendarContract.Events.LAST_DATE + " <= " + (endTime + ONE_DAY_TIME);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        } finally {
+            selection1 += tempStr;
+        }
+
+        //LogUtils.i(" ( " + selection1 + " ) " + " OR" + " ( " + selection2 + " ) ");
+//        dtstart>=1512576000000 and dtend<=1512662400000 and ( calendar_id = 1 OR calendar_id = 2 )
+        return " ( " + selection1 + " ) " + " OR " + " ( " + selection2 + " ) ";
     }
 
     public static void getOneDayCalendarEvent(Context context, String someDate, QueryHandler.OnQueryEventCompleteListener onQueryEventCompleteListener) {
@@ -449,7 +513,7 @@ public class LocalCalendarEventUtils {
             @Override
             public void handleMessage(Message msg) {
                 /**当监听到改变时，做业务操作*/
-               // EventBus.getDefault().post(new EventMessage(EventMessage.Schedule.UPDATE_SCHEDULE_LIST));
+                // EventBus.getDefault().post(new EventMessage(EventMessage.Schedule.UPDATE_SCHEDULE_LIST));
             }
         });
 

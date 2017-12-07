@@ -17,6 +17,8 @@ public class ScheduleToDo implements Serializable {
 
     private boolean isLocalCalendarSchedule;
 
+    private boolean isAllDayCalendarTask;
+
     public String getId() {
         return id;
     }
@@ -95,6 +97,14 @@ public class ScheduleToDo implements Serializable {
 
     public void setLocalCalendarEndTime(long localCalendarEndTime) {
         this.localCalendarEndTime = localCalendarEndTime;
+    }
+
+    public boolean isAllDayCalendarTask() {
+        return isAllDayCalendarTask;
+    }
+
+    public void setAllDayCalendarTask(boolean allDayCalendarTask) {
+        isAllDayCalendarTask = allDayCalendarTask;
     }
 
     @Override

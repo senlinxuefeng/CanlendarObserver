@@ -1,6 +1,7 @@
 package com.yumingchuan.calendarobserver;
 
 import android.Manifest;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -27,6 +28,7 @@ import java.util.List;
  */
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     private BaseRecyclerViewAdapter baseRecyclerViewAdapter;
+    private Context mContext;
 
 
 //    String[] projection = new String[] { CalendarContract.Events._ID , CalendarContract.Events.CALENDAR_ID, CalendarContract.Events.TITLE, CalendarContract.Events.DESCRIPTION, CalendarContract.Events.DTSTART, CalendarContract.Events.DTEND, CalendarContract.Events.ALL_DAY, CalendarContract.Events.EVENT_LOCATION , CalendarContract.Events.RRULE ,CalendarContract.Events.DURATION };
@@ -40,6 +42,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        mContext = this;
 
         Utils.init(getApplication());
 
@@ -75,7 +79,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void onItemClick(Object object, int position) {
                 ScheduleToDo scheduleToDo = (ScheduleToDo) object;
-                LocalCalendarEventUtils.openCalendarEventDetail(getApplicationContext(), scheduleToDo);
+                LocalCalendarEventUtils.openCalendarEventDetail(mContext, scheduleToDo);
             }
         });
 
