@@ -357,54 +357,6 @@ public class LocalCalendarEventUtils {
 
     private static String getOneDaySelection(String startDate, String endDate) {
         String tempStr = "";
-        String selection = "";
-
-        try {
-            long startTime = dateFormat_yyyyMMdd.parse(startDate).getTime();
-            long endTime = dateFormat_yyyyMMdd.parse(endDate).getTime() + ONE_DAY_TIME;
-
-            selection = android.provider.CalendarContract.Events.DTSTART + ">=" + startTime + " and "
-                    + android.provider.CalendarContract.Events.DTEND + "<=" + endTime;
-
-            String calendarId = CalendarContract.Events.CALENDAR_ID;
-            String containCalendarIds = SPUtils.getInstance().getString("containCalendarIds", "");
-            String[] noContainCalendarIdArrays = EmptyUtils.isEmpty(containCalendarIds) ? null : containCalendarIds.split(",");
-
-            if (!EmptyUtils.isEmpty(noContainCalendarIdArrays)) {
-                for (int i = 0; i < noContainCalendarIdArrays.length; i++) {
-                    if (i == 0) {
-                        if (noContainCalendarIdArrays.length == 1) {
-                            tempStr += " and " + calendarId + " = " + noContainCalendarIdArrays[i];
-                        } else {
-                            tempStr += " and ( " + calendarId + " = " + noContainCalendarIdArrays[i];
-                        }
-                    } else if (i == noContainCalendarIdArrays.length - 1) {
-                        tempStr += " OR " + calendarId + " = " + noContainCalendarIdArrays[i] + " )";
-                    } else {
-                        tempStr += " OR " + calendarId + " = " + noContainCalendarIdArrays[i];
-                    }
-                }
-            } else {
-                // tempStr += " and " + calendarId + " = -1000";
-            }
-
-        } catch (ParseException e) {
-            e.printStackTrace();
-        } finally {
-            selection += tempStr;
-        }
-
-
-        LogUtils.i(selection);
-
-
-//        return selection;
-        return "calendar_id = 1";
-    }
-
-
-    private static String getOneDaySelection(String startDate, String endDate) {
-        String tempStr = "";
         String selection1 = "";
         String selection2 = "";
 
@@ -443,6 +395,7 @@ public class LocalCalendarEventUtils {
             selection1 += tempStr;
         }
 
+//        return "calendar_id = 1";
         //LogUtils.i(" ( " + selection1 + " ) " + " OR" + " ( " + selection2 + " ) ");
 //        dtstart>=1512576000000 and dtend<=1512662400000 and ( calendar_id = 1 OR calendar_id = 2 )
         return " ( " + selection1 + " ) " + " OR " + " ( " + selection2 + " ) ";
