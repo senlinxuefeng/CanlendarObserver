@@ -75,7 +75,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void onItemClick(Object object, int position) {
                 ScheduleToDo scheduleToDo = (ScheduleToDo) object;
-                LocalCalendarEventUtils.openCalendarEventDetail(getApplicationContext(), Integer.parseInt(scheduleToDo.getId()));
+                LocalCalendarEventUtils.openCalendarEventDetail(getApplicationContext(), scheduleToDo);
             }
         });
 
@@ -123,7 +123,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 if (!isDeniedPermission()) {
                     requestPermission();
                 } else {
-                    baseRecyclerViewAdapter.reloadData(LocalCalendarEventUtils.getOneDayCalendarEvent(getApplicationContext(), "20171205"));
+                    baseRecyclerViewAdapter.reloadData(LocalCalendarEventUtils.getOneDayCalendarEvent(getApplicationContext(), "20171207"));
                 }
                 break;
 

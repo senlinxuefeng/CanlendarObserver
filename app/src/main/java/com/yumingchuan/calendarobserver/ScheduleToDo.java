@@ -11,6 +11,9 @@ public class ScheduleToDo implements Serializable {
     public String startDate;
     public String endDate;
     public String event;
+    public String pDisplayOrder;
+    public long localCalendarStartTime;
+    public long localCalendarEndTime;
 
     private boolean isLocalCalendarSchedule;
 
@@ -68,6 +71,30 @@ public class ScheduleToDo implements Serializable {
 
     public void setLocalCalendarSchedule(boolean localCalendarSchedule) {
         isLocalCalendarSchedule = localCalendarSchedule;
+    }
+
+    public String getpDisplayOrder() {
+        return pDisplayOrder;
+    }
+
+    public void setpDisplayOrder(String pDisplayOrder) {
+        this.pDisplayOrder = pDisplayOrder;
+    }
+
+    public long getLocalCalendarStartTime() {
+        return localCalendarStartTime;
+    }
+
+    public void setLocalCalendarStartTime(long localCalendarStartTime) {
+        this.localCalendarStartTime = localCalendarStartTime;
+    }
+
+    public long getLocalCalendarEndTime() {
+        return localCalendarEndTime;
+    }
+
+    public void setLocalCalendarEndTime(long localCalendarEndTime) {
+        this.localCalendarEndTime = localCalendarEndTime;
     }
 
     @Override

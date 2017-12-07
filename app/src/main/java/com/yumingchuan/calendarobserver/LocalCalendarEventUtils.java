@@ -1,5 +1,7 @@
+
 package com.yumingchuan.calendarobserver;
 
+import android.app.Activity;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
@@ -7,11 +9,14 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.net.Uri;
+import android.os.Handler;
+import android.os.Message;
 import android.provider.CalendarContract;
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.blankj.utilcode.util.EmptyUtils;
 import com.blankj.utilcode.util.LogUtils;
 import com.blankj.utilcode.util.SPUtils;
 
@@ -59,42 +64,36 @@ public class LocalCalendarEventUtils {
      *
      * @param context
      */
-    public static void getAllCalendarNames(Context context) {
+    public static List<String[]> getAllCalendarNames(Context context) {
+        List<String[]> calendarAccountNameAndDisplayNames = new ArrayList<>();
         String uri = "content://com.android.calendar/calendars";
 //        查询手机日历：
         Uri calendars = Uri.parse(uri);
         Cursor managedCursor = context.getContentResolver().query(calendars, null, null, null, null);
 
 
-        String[] tempNames = managedCursor.getColumnNames();
-
-
-        for (int i = 0; i < tempNames.length; i++) {
-            LogUtils.i(tempNames[i]);
-        }
-
+//        String[] tempNames = managedCursor.getColumnNames();
+//        for (int i = 0; i < tempNames.length; i++) {
+//            LogUtils.i(tempNames[i]);
+//        }
 
         if (managedCursor.moveToFirst()) {
             do {
+                //Log.i("idid", managedCursor.getString(managedCursor.getColumnIndex("calendar_displayName")));
+//                Log.i("idid", managedCursor.getString(managedCursor.getColumnIndex("account_name")));
 
+                String[] tempCalendarAccountNameAndDisplayName = new String[3];
 
-                Log.i("idid", managedCursor.getString(managedCursor.getColumnIndex(CalendarContract.Calendars._ID)));
-                Log.i("idid", managedCursor.getString(managedCursor.getColumnIndex(CalendarContract.Calendars.ACCOUNT_NAME)));
-                Log.i("idid", managedCursor.getString(managedCursor.getColumnIndex(CalendarContract.Calendars.CALENDAR_DISPLAY_NAME)));
+                tempCalendarAccountNameAndDisplayName[0] = managedCursor.getString(managedCursor.getColumnIndex(CalendarContract.Calendars._ID));
+                tempCalendarAccountNameAndDisplayName[1] = managedCursor.getString(managedCursor.getColumnIndex(CalendarContract.Calendars.ACCOUNT_NAME));
+                tempCalendarAccountNameAndDisplayName[2] = managedCursor.getString(managedCursor.getColumnIndex(CalendarContract.Calendars.CALENDAR_DISPLAY_NAME));
 
-
-                try {
-                    Log.i("idid", dateFormat_yyyyMMdd.parse("20171204").getTime() + "");
-                    Log.i("idid", dateFormat_yyyy_MM_dd_hh_mm_ss.parse("2017-12-04 00:00:00").getTime() + "");
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                }
-
+                calendarAccountNameAndDisplayNames.add(tempCalendarAccountNameAndDisplayName);
 
             } while (managedCursor.moveToNext());
         }
 
-
+        return calendarAccountNameAndDisplayNames;
     }
 
 
@@ -257,8 +256,8 @@ public class LocalCalendarEventUtils {
 
             // String[] selectionArgs = {android.provider.CalendarContract.Events.DTSTART + ">" + 1, android.provider.CalendarContract.Events.DTEND + "<" + 1};
 //        String selection = android.provider.CalendarContract.Events.DTSTART + "<" + 11119910011111L;
-            String selection1 = android.provider.CalendarContract.Events.DTSTART + ">" + startTime + " and "
-                    + android.provider.CalendarContract.Events.DTEND + "<" + endTime
+            String selection1 = android.provider.CalendarContract.Events.DTSTART + ">=" + startTime + " and "
+                    + android.provider.CalendarContract.Events.DTEND + "<=" + endTime
                     + " and " + CalendarContract.Events.CALENDAR_ID + "= 1";
 
 
@@ -304,25 +303,38 @@ public class LocalCalendarEventUtils {
      */
     public static List<ScheduleToDo> getOneDayCalendarEvent(Context context, String someDate) {
         List<ScheduleToDo> calendarEvents = new ArrayList<>();
-        Cursor eventCursor = context.getContentResolver().query(Uri.parse(CALANDER_EVENT_URL), null, getOneDaySelection(someDate, someDate), null, null);
+
         try {
-            if (eventCursor == null)//查询返回空值
-                return calendarEvents;
-            if (eventCursor.getCount() > 0) {
-                //遍历所有事件，找到title跟需要查询的title一样的项
-                for (eventCursor.moveToFirst(); !eventCursor.isAfterLast(); eventCursor.moveToNext()) {
-                    ScheduleToDo scheduleToDo = new ScheduleToDo();
-                    scheduleToDo.setLocalCalendarSchedule(true);
-                    scheduleToDo.setId(eventCursor.getInt(eventCursor.getColumnIndex(CalendarContract.Calendars._ID)) + "");
-                    scheduleToDo.setpTitle(eventCursor.getString(eventCursor.getColumnIndex(CalendarContract.Events.TITLE)));
-                    scheduleToDo.setpNote(eventCursor.getString(eventCursor.getColumnIndex(CalendarContract.Events.DESCRIPTION)));
-                    calendarEvents.add(scheduleToDo);
+
+            int calendarEventCount = -1000;
+            Cursor eventCursor = context.getContentResolver().query(Uri.parse(CALANDER_EVENT_URL), null, getOneDaySelection(someDate, someDate), null, null);
+            try {
+                if (eventCursor == null)//查询返回空值
+                    return calendarEvents;
+                if (eventCursor.getCount() > 0) {
+                    //遍历所有事件，找到title跟需要查询的title一样的项
+                    for (eventCursor.moveToFirst(); !eventCursor.isAfterLast(); eventCursor.moveToNext()) {
+                        ScheduleToDo scheduleToDo = new ScheduleToDo();
+                        scheduleToDo.setLocalCalendarSchedule(true);
+                        scheduleToDo.setpDisplayOrder((calendarEventCount--) + "");
+                        scheduleToDo.setId(eventCursor.getInt(eventCursor.getColumnIndex(CalendarContract.Calendars._ID)) + "");
+                        scheduleToDo.setpTitle(eventCursor.getString(eventCursor.getColumnIndex(CalendarContract.Events.TITLE)));
+                        scheduleToDo.setpNote(eventCursor.getString(eventCursor.getColumnIndex(CalendarContract.Events.DESCRIPTION)));
+
+                        scheduleToDo.setLocalCalendarStartTime(eventCursor.getLong(eventCursor.getColumnIndex(CalendarContract.Events.DTSTART)));
+                        scheduleToDo.setLocalCalendarEndTime(eventCursor.getLong(eventCursor.getColumnIndex(CalendarContract.Events.DTEND)));
+
+                        calendarEvents.add(scheduleToDo);
+                    }
+                }
+            } finally {
+                if (eventCursor != null) {
+                    eventCursor.close();
                 }
             }
-        } finally {
-            if (eventCursor != null) {
-                eventCursor.close();
-            }
+
+        } catch (Exception e) {
+
         }
         return calendarEvents;
     }
@@ -335,29 +347,30 @@ public class LocalCalendarEventUtils {
             long startTime = dateFormat_yyyyMMdd.parse(startDate).getTime();
             long endTime = dateFormat_yyyyMMdd.parse(endDate).getTime() + ONE_DAY_TIME;
 
-            selection = android.provider.CalendarContract.Events.DTSTART + ">" + startTime + " and "
-                    + android.provider.CalendarContract.Events.DTEND + "<" + endTime;
-
+            selection = android.provider.CalendarContract.Events.DTSTART + ">=" + startTime + " and "
+                    + android.provider.CalendarContract.Events.DTEND + "<=" + endTime;
 
             String calendarId = CalendarContract.Events.CALENDAR_ID;
-            String noContainCalendarIds = SPUtils.getInstance().getString("noContainCalendarIds", "");
-            String[] noContainCalendarIdArrays = noContainCalendarIds.split(",");
+            String containCalendarIds = SPUtils.getInstance().getString("containCalendarIds", "");
+            String[] noContainCalendarIdArrays = EmptyUtils.isEmpty(containCalendarIds) ? null : containCalendarIds.split(",");
 
-            for (int i = 0; i < noContainCalendarIdArrays.length; i++) {
-                if (i == 0) {
-                    if (noContainCalendarIdArrays.length == 1) {
-//                        tempStr += " and " + calendarId + " = " + noContainCalendarIdArrays[i];
-                        tempStr += " and " + calendarId + " = " + 1;
+            if (!EmptyUtils.isEmpty(noContainCalendarIdArrays)) {
+                for (int i = 0; i < noContainCalendarIdArrays.length; i++) {
+                    if (i == 0) {
+                        if (noContainCalendarIdArrays.length == 1) {
+                            tempStr += " and " + calendarId + " = " + noContainCalendarIdArrays[i];
+                        } else {
+                            tempStr += " and ( " + calendarId + " = " + noContainCalendarIdArrays[i];
+                        }
+                    } else if (i == noContainCalendarIdArrays.length - 1) {
+                        tempStr += " OR " + calendarId + " = " + noContainCalendarIdArrays[i] + " )";
                     } else {
-                        tempStr += " and ( " + calendarId + " = " + noContainCalendarIdArrays[i];
+                        tempStr += " OR " + calendarId + " = " + noContainCalendarIdArrays[i];
                     }
-                } else if (i == noContainCalendarIdArrays.length - 1) {
-                    tempStr += " OR " + calendarId + " = " + noContainCalendarIdArrays[i] + " )";
-                } else {
-                    tempStr += " OR " + calendarId + " = " + noContainCalendarIdArrays[i];
                 }
+            } else {
+               // tempStr += " and " + calendarId + " = -1000";
             }
-
 
         } catch (ParseException e) {
             e.printStackTrace();
@@ -368,8 +381,19 @@ public class LocalCalendarEventUtils {
 
         LogUtils.i(selection);
 
-//        return selection;
-        return "dtstart>1512403200000 and dtend<1512489600000 and ( calendar_id = 0 OR calendar_id = 2 )";
+        return selection;
+    }
+
+    public static void getOneDayCalendarEvent(Context context, String someDate, QueryHandler.OnQueryEventCompleteListener onQueryEventCompleteListener) {
+        try {
+            QueryHandler queryHandler = new QueryHandler(context.getContentResolver());
+            queryHandler.setOnQueryEventCompleteListener(onQueryEventCompleteListener);
+            //执行查询语句，可以将adapter作为第二个参数传入
+            queryHandler.startQuery(11122, null, Uri.parse(CALANDER_EVENT_URL), null, getOneDaySelection(someDate, someDate), null, null);
+        } catch (Exception e) {
+            onQueryEventCompleteListener.onQueryEventComplete(new ArrayList<ScheduleToDo>());
+        }
+
     }
 
 
@@ -377,22 +401,22 @@ public class LocalCalendarEventUtils {
      * 打开日历日程数据的详情
      *
      * @param cnt
-     * @param id
+     * @param scheduleToDo
      */
-    public static void openCalendarEventDetail(Context cnt, int id) {
+    public static void openCalendarEventDetail(Context cnt, ScheduleToDo scheduleToDo) {
 
         //具体的一条日历数据
 //        id=2   pTitle=1   pNote=null   startDate=1511488800000   endDate=1511492400000
 
         try {
+            Uri uri = ContentUris.withAppendedId(CalendarContract.Events.CONTENT_URI, Integer.parseInt(scheduleToDo.id));
             Intent t_intent = new Intent(Intent.ACTION_VIEW);
-            t_intent.addCategory(Intent.CATEGORY_DEFAULT);
-            t_intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK
-                    | Intent.FLAG_ACTIVITY_TASK_ON_HOME);
-            Uri uri = ContentUris.withAppendedId(CalendarContract.Events.CONTENT_URI, id);
-//            t_intent.putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, scheduleToDo.getLocalCalendarStartTime());
-//            t_intent.putExtra(CalendarContract.EXTRA_EVENT_END_TIME, scheduleToDo.getLocalCalendarEndTime());
+//            t_intent.addCategory(Intent.CATEGORY_DEFAULT);
+//            t_intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK
+//                    | Intent.FLAG_ACTIVITY_TASK_ON_HOME);
             t_intent.setData(uri);
+            t_intent.putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, scheduleToDo.getLocalCalendarStartTime());
+            t_intent.putExtra(CalendarContract.EXTRA_EVENT_END_TIME, scheduleToDo.getLocalCalendarEndTime());
             cnt.startActivity(t_intent);
         } catch (Exception e) {
             e.printStackTrace();
@@ -417,5 +441,23 @@ public class LocalCalendarEventUtils {
             Toast.makeText(cnt, "打开日历失败", Toast.LENGTH_SHORT).show();
         }
     }
+
+
+    public static void registerContentObserver(Activity activity) {
+        //    在主类中，实例化并实施监听
+        CalendarObserver calObserver = new CalendarObserver(activity, new Handler() {
+            @Override
+            public void handleMessage(Message msg) {
+                /**当监听到改变时，做业务操作*/
+               // EventBus.getDefault().post(new EventMessage(EventMessage.Schedule.UPDATE_SCHEDULE_LIST));
+            }
+        });
+
+        activity.getContentResolver().unregisterContentObserver(calObserver);
+
+        //注册日程事件监听
+        activity.getContentResolver().registerContentObserver(CalendarContract.Events.CONTENT_URI, true, calObserver);
+    }
+
 
 }
